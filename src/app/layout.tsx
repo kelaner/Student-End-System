@@ -4,8 +4,8 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import CommonLayouts from "@/layouts/common";
-
+import {AntdRegistry} from '@ant-design/nextjs-registry';
+import React from "react";
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -20,9 +20,9 @@ export default function RootLayout({children}: Readonly<{
 	return (
 		<html lang="en">
 		<body className={inter.className}>
-		<CommonLayouts>
+		<AntdRegistry>
 			{children}
-		</CommonLayouts>
+		</AntdRegistry>
 		</body>
 		</html>
 	);
