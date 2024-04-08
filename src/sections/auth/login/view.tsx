@@ -5,6 +5,7 @@ import {loginAction, Role, User, userAtom} from "@/utils/user";
 import {Button, Card, Container, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
 import {useAtom} from "jotai";
 import {StudentLogin} from "@/sections/auth/login/data";
+import {StdentInfo} from "@/sections/auth/login/type";
 
 export default function LoginView() {
 	const [username, setUsername] = useState('');
@@ -27,8 +28,11 @@ export default function LoginView() {
 		if (role === "student") {
 			StudentLogin(username, password).then(res => {
 				console.log("Res", res)
-				handleLoginAction[ 1 ](res.data.rows[ 0 ])
-			})
+				res.data.code
+				handleLoginAction[ 1 ](res.data.rows.filter((i: { sid: string }) => i.sid === username)[ 0 ])
+
+				window.location.replace("/home")
+			}).catch()
 		}
 		// try {
 		// 	// 模拟登录成功

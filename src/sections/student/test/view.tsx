@@ -35,10 +35,13 @@ const metaData = [
 function TestView(props: Props) {
 	const [topicIndex, setTopicIndex] = useState<number>(0)
 
-	const [open, setOpen] = useState(false);
+	const [open, setOpen] = useState<boolean>(false);
+
+	const [totalValue,setTotalValue]=useState(0)
 
 	const handleClick = () => {
 		setOpen(true);
+
 	};
 
 	const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {

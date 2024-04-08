@@ -5,6 +5,7 @@ export interface Student {
 	sgender: string; // 性别
 	classid: string; // 班级
 	spass: string; // 密码
+
 }
 
 // Teacher 表

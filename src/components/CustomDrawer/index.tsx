@@ -25,6 +25,7 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import {StudentFeekHelp} from "@/components/CustomDrawer/data";
 
 
 export default function CustomDrawer({role}: { role?: Role }) {
@@ -68,6 +69,16 @@ export default function CustomDrawer({role}: { role?: Role }) {
 			enqueueSnackbar("密码修改成功", {variant: "success"})
 			setShowPasswordDialog(false)
 		}
+	}
+
+	function handleStudentFeekHelp() {
+		StudentFeekHelp(user?.sid as string, user?.sname as string, new Date()).then(res => {
+			if(res.data.code === "200"){
+				console.log("123")
+				alert(123)
+
+			}
+		})
 	}
 
 
@@ -167,7 +178,10 @@ export default function CustomDrawer({role}: { role?: Role }) {
                             <ListItemText primary="会面安排"/>
                         </ListItemButton>
 
-                        <ListItemButton sx={{backgroundColor: "#1F2D3D", color: "#9AAABB", pl: 5}}>
+                        <ListItemButton
+                            sx={{backgroundColor: "#1F2D3D", color: "#9AAABB", pl: 5}}
+                            onClick={handleStudentFeekHelp}
+                        >
                             <ListItemText primary="请求帮助"/>
                         </ListItemButton>
                     </List>
