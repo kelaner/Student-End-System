@@ -25,7 +25,8 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import {StudentFeekHelp} from "@/components/CustomDrawer/data";
+import {StudentSeekHelp} from "@/components/CustomDrawer/data";
+import {getGender} from "@/utils/gender";
 
 
 export default function CustomDrawer({role}: { role?: Role }) {
@@ -71,9 +72,9 @@ export default function CustomDrawer({role}: { role?: Role }) {
 		}
 	}
 
-	function handleStudentFeekHelp() {
-		StudentFeekHelp(user?.sid as string, user?.sname as string, new Date()).then(res => {
-			if(res.data.code === "200"){
+	function handleStudentSeekHelp() {
+		StudentSeekHelp(user?.sid as string, user?.sname as string, new Date()).then(res => {
+			if (res.data.code === "200") {
 				console.log("123")
 				alert(123)
 
@@ -83,17 +84,17 @@ export default function CustomDrawer({role}: { role?: Role }) {
 
 
 	return (
-		<Box sx={{height: "100%", backgroundColor: "#304156"}}>
+		<Box sx={{height: "100%", background: "linear-gradient(102deg, #F1F5FE 8.4%, #FEF8F1 83.36%)",}}>
 
-			<Card sx={{my: 3, mx: 2, p: 2}}>
-				<Typography variant={"h6"}>个人信息</Typography>
-				<Typography variant={"h6"}>工号：{user?.sid}</Typography>
-				<Typography variant={"h6"}>姓名：{user?.sname}</Typography>
+			<Card sx={{m: 2, mb: 0, p: 2}}>
+				{/*<Typography variant={"subtitle1"} fontWeight={600}>个人信息</Typography>*/}
+				<Typography variant={"subtitle1"} fontWeight={600}>工号：{user?.sid}</Typography>
+				<Typography variant={"subtitle1"} fontWeight={600}>姓名：{user?.sname}</Typography>
 				{
 					user?.roles === "student" &&
             <>
-                <Typography variant={"h6"}>班级：{user?.classid}</Typography>
-                <Typography variant={"h6"}>性别：{user?.sgender}</Typography>
+                <Typography variant={"subtitle1"} fontWeight={600}>班级：{user?.classid}</Typography>
+                <Typography variant={"subtitle1"} fontWeight={600}>性别：{getGender(user?.sgender)}</Typography>
             </>
 				}
 			</Card>
@@ -156,14 +157,14 @@ export default function CustomDrawer({role}: { role?: Role }) {
 				<ListItemButton onClick={() => window.location.replace("/home")}>
 					<Typography
 						variant={"h6"}
-						sx={{width: "100%", color: path === "/home" ? "#389CFD" : "#9AAABB", pl: 1}}>首页</Typography>
+						sx={{width: "100%", color: path === "/home" ? "#2395F1" : "#2B2D30", pl: 1}}>首页</Typography>
 				</ListItemButton>
 
 				{
 					( role === "student" || user?.roles === "student" ) &&
             <>
                 <ListItemButton onClick={() => handleClick(0)}>
-                    <Typography variant={"h6"} sx={{width: "100%", color: "#9AAABB", pl: 1}}>消息</Typography>
+                    <Typography variant={"h6"} sx={{width: "100%", color: "#2B2D30", pl: 1}}>消息</Typography>
 									{open[ 0 ] ? <ExpandLess/> : <ExpandMore/>}
                 </ListItemButton>
                 <Collapse in={open[ 0 ]} timeout="auto" unmountOnExit>
@@ -171,16 +172,15 @@ export default function CustomDrawer({role}: { role?: Role }) {
                         <ListItemButton
                             onClick={() => window.location.replace("/student/message/meeting")}
                             sx={{
-															backgroundColor: "#1F2D3D",
-															color: path === "/student/message/meeting" ? "#389CFD" : "#9AAABB",
+															color: path === "/student/message/meeting" ? "#2395F1" : "#2B2D30",
 															pl: 5
 														}}>
                             <ListItemText primary="会面安排"/>
                         </ListItemButton>
 
                         <ListItemButton
-                            sx={{backgroundColor: "#1F2D3D", color: "#9AAABB", pl: 5}}
-                            onClick={handleStudentFeekHelp}
+                            sx={{color: "#2B2D30", pl: 5}}
+                            onClick={handleStudentSeekHelp}
                         >
                             <ListItemText primary="请求帮助"/>
                         </ListItemButton>
@@ -189,7 +189,7 @@ export default function CustomDrawer({role}: { role?: Role }) {
 
 
                 <ListItemButton onClick={() => handleClick(1)}>
-                    <Typography variant={"h6"} sx={{width: "100%", color: "#9AAABB", pl: 1}}>测试</Typography>
+                    <Typography variant={"h6"} sx={{width: "100%", color: "#2B2D30", pl: 1}}>测试</Typography>
 									{open[ 1 ] ? <ExpandLess/> : <ExpandMore/>}
                 </ListItemButton>
                 <Collapse in={open[ 1 ]} timeout="auto" unmountOnExit>
@@ -197,8 +197,7 @@ export default function CustomDrawer({role}: { role?: Role }) {
                         <ListItemButton
                             onClick={() => window.location.replace("/student/test/test")}
                             sx={{
-															backgroundColor: "#1F2D3D",
-															color: path === "/student/test/test" ? "#389CFD" : "#9AAABB",
+															color: path === "/student/test/test" ? "#2395F1" : "#2B2D30",
 															pl: 5
 														}}>
                             <ListItemText primary="测试"/>
@@ -206,8 +205,7 @@ export default function CustomDrawer({role}: { role?: Role }) {
                         <ListItemButton
                             onClick={() => window.location.replace("/student/test/log")}
                             sx={{
-															backgroundColor: "#1F2D3D",
-															color: path === "/student/test/log" ? "#389CFD" : "#9AAABB",
+															color: path === "/student/test/log" ? "#2395F1" : "#2B2D30",
 															pl: 5
 														}}>
                             <ListItemText primary="记录"/>
@@ -227,13 +225,13 @@ export default function CustomDrawer({role}: { role?: Role }) {
                         variant={"h6"}
                         sx={{
 													width: "100%",
-													color: path === "/teacher/warning" ? "#389CFD" : "#9AAABB",
+													color: path === "/teacher/warning" ? "#2395F1" : "#2B2D30",
 													pl: 1
 												}}>预警名单</Typography>
                 </ListItemButton>
 
                 <ListItemButton onClick={() => handleClick(2)}>
-                    <Typography variant={"h6"} sx={{width: "100%", color: "#9AAABB", pl: 1}}>记录查询</Typography>
+                    <Typography variant={"h6"} sx={{width: "100%", color: "#2B2D30", pl: 1}}>记录查询</Typography>
 									{open[ 2 ] ? <ExpandLess/> : <ExpandMore/>}
                 </ListItemButton>
                 <Collapse in={open[ 2 ]} timeout="auto" unmountOnExit>
@@ -241,8 +239,7 @@ export default function CustomDrawer({role}: { role?: Role }) {
                         <ListItemButton
                             onClick={() => window.location.replace("/teacher/record/test")}
                             sx={{
-															backgroundColor: "#1F2D3D",
-															color: path === "/teacher/record/test" ? "#389CFD" : "#9AAABB",
+															color: path === "/teacher/record/test" ? "#2395F1" : "#2B2D30",
 															pl: 5
 														}}>
                             <ListItemText primary="测试记录"/>
@@ -250,8 +247,7 @@ export default function CustomDrawer({role}: { role?: Role }) {
                         <ListItemButton
                             onClick={() => window.location.replace("/teacher/record/meet")}
                             sx={{
-															backgroundColor: "#1F2D3D",
-															color: path === "/teacher/record/meet" ? "#389CFD" : "#9AAABB",
+															color: path === "/teacher/record/meet" ? "#2395F1" : "#2B2D30",
 															pl: 5
 														}}>
                             <ListItemText primary="会面记录"/>
@@ -262,21 +258,21 @@ export default function CustomDrawer({role}: { role?: Role }) {
             </>
 				}
 				<ListItemButton onClick={() => handleClick(3)}>
-					<Typography variant={"h6"} sx={{width: "100%", color: "#9AAABB", pl: 1}}>设置</Typography>
+					<Typography variant={"h6"} sx={{width: "100%", color: "#2B2D30", pl: 1}}>设置</Typography>
 					{open[ 3 ] ? <ExpandLess/> : <ExpandMore/>}
 				</ListItemButton>
 				<Collapse in={open[ 3 ]} timeout="auto" unmountOnExit>
 					<List component="div" disablePadding>
 						<ListItemButton
 							onClick={() => setShowPasswordDialog(true)}
-							sx={{backgroundColor: "#1F2D3D", color: "#9AAABB", pl: 5}}
+							sx={{color: "#2B2D30", pl: 5}}
 						>
 							<ListItemText primary="重置密码"/>
 						</ListItemButton>
 
 						<ListItemButton
 							onClick={handleLogout}
-							sx={{backgroundColor: "#1F2D3D", color: "#9AAABB", pl: 5}}
+							sx={{color: "#2B2D30", pl: 5}}
 						>
 							<ListItemText primary="退出登录"/>
 						</ListItemButton>

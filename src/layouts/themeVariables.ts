@@ -1,12 +1,12 @@
 import {styled} from "@mui/material/styles";
 import {createTheme} from "@mui/material";
-import {teal} from "@mui/material/colors";
+import {blue} from "@mui/material/colors";
 import MuiAppBar, {AppBarProps as MuiAppBarProps} from '@mui/material/AppBar';
 import {isMobile} from "react-device-detect";
 
-// 定义抽屉宽度和应用栏高度
+// 定义抽屉宽度
 export const drawerWidth = 230;
-export const appBarHeight = 64;
+
 
 // 定义主要内容区域样式
 export const Main = styled("main", {
@@ -64,7 +64,7 @@ export const DrawerHeader = styled("div")(({theme}) => ( {
 // 创建自定义主题
 export const theme = createTheme({
 	palette: {
-		primary: teal, // 设置主题的主要颜色为teal色调
+		primary: blue, // 设置主题的主要颜色为teal色调
 		secondary: {
 			main: "#fff", // 设置主题的次要颜色为白色
 		},

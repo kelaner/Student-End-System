@@ -6,11 +6,13 @@ import {useEffect} from 'react';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from "@mui/material/IconButton";
-import {Stack, ThemeProvider, Toolbar} from "@mui/material";
+import {Divider, Stack, ThemeProvider, Toolbar} from "@mui/material";
 import {AppBar, DrawerHeader, drawerWidth, Main, theme} from "@/layouts/themeVariables";
 import MenuIcon from "@mui/icons-material/Menu";
 import CustomDrawer from "@/components/CustomDrawer";
 import {Role} from "@/utils/user";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import {isMobile} from "react-device-detect";
 
 interface Props {
@@ -20,61 +22,68 @@ interface Props {
 
 export default function PersistentDrawerLeft({children, role}: Props) {
 
-	const [open, setOpen] = React.useState(false);
+	const [open, setOpen] = React.useState(true);
 
 	useEffect(() => {
 		setOpen(!isMobile)
 	}, [])
 
-	const handleDrawerChange = () => {
-		setOpen(!open);
+	const handleDrawerOpen = () => {
+		setOpen(true);
+	};
+
+	const handleDrawerClose = () => {
+		setOpen(false);
 	};
 
 
 	return (
 		<Stack direction={"column"}>
 			<CssBaseline/>
+			<ThemeProvider theme={theme}>
+
+
+				<AppBar position="fixed" open={open}>
+					<Toolbar>
+						<IconButton
+							color="inherit"
+							aria-label="open drawer"
+							onClick={handleDrawerOpen}
+							edge="start"
+							sx={{mr: 2, ...( open && {display: 'none'} )}}
+						>
+							<MenuIcon/>
+						</IconButton>
+
+					</Toolbar>
+				</AppBar>
+			</ThemeProvider>
 
 			<Drawer
-				PaperProps={{
-					sx: {
-						backgroundColor: "#304156",
-					},
-				}}
 				sx={{
-					backgroundColor: "#304156",
 					width: drawerWidth,
 					flexShrink: 0,
-					"& .MuiDrawer-paper": {
+					'& .MuiDrawer-paper': {
 						width: drawerWidth,
-						boxSizing: "border-box",
-						boxShadow: "0px 0px 20px 0px rgba(0,0,0,0.08)",
-						borderRight: "none",
+						boxSizing: 'border-box',
 					},
 				}}
 				variant="persistent"
 				anchor="left"
 				open={open}
 			>
+				<DrawerHeader sx={{background: "linear-gradient(102deg, #F1F5FE 8.4%, #FEF8F1 83.36%)"}}>
+					<IconButton onClick={handleDrawerClose}>
+						{theme.direction === 'ltr' ? <ChevronLeftIcon/> : <ChevronRightIcon/>}
+					</IconButton>
+				</DrawerHeader>
+				<Divider/>
 				<CustomDrawer role={role}/>
 			</Drawer>
 
+
 			<Main open={open}>
-				<ThemeProvider theme={theme}>
-					<AppBar position="fixed" open={open} sx={{backgroundColor: "#304156"}}>
-						<Toolbar>
-							<IconButton
-								color="inherit"
-								aria-label="open drawer"
-								onClick={handleDrawerChange}
-								edge="start"
-								sx={{mr: 2}}
-							>
-								<MenuIcon sx={{color: "white"}}/>
-							</IconButton>
-						</Toolbar>
-					</AppBar>
-				</ThemeProvider>
+
 
 				<DrawerHeader/>
 				{children}

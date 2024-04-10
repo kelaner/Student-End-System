@@ -1,11 +1,10 @@
 "use client"
 
 import {useEffect, useState} from 'react';
-import {loginAction, Role, User, userAtom} from "@/utils/user";
+import {loginAction, Role, userAtom} from "@/utils/user";
 import {Button, Card, Container, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
 import {useAtom} from "jotai";
 import {StudentLogin} from "@/sections/auth/login/data";
-import {StdentInfo} from "@/sections/auth/login/type";
 
 export default function LoginView() {
 	const [username, setUsername] = useState('');
@@ -28,10 +27,15 @@ export default function LoginView() {
 		if (role === "student") {
 			StudentLogin(username, password).then(res => {
 				console.log("Res", res)
-				res.data.code
-				handleLoginAction[ 1 ](res.data.rows.filter((i: { sid: string }) => i.sid === username)[ 0 ])
+				if (res.data.code === 200) {
+					console.log(res.data.row?.filter((i: { sid: string }) => i.sid === username)[ 0 ])
+					handleLoginAction[ 1 ]({
+						...res.data.row?.filter((i: { sid: string }) => i.sid === username)[ 0 ],
+						roles: role
+					})
+					window.location.replace("/home")
+				}
 
-				window.location.replace("/home")
 			}).catch()
 		}
 		// try {

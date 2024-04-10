@@ -11,9 +11,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import {useAtom} from "jotai";
+import {userAtom} from "@/utils/user";
 
 
 function HomeView() {
+
+	const [user] = useAtom(userAtom)
+
+	console.log("user", user)
 
 	const rows = [
 		{id: 1, name: "人工智能在医疗领域的应用", date: "2024年3月27日"},
