@@ -1,6 +1,8 @@
 import axios, {AxiosRequestConfig} from "axios";
 
-const axiosInstance = axios.create({baseURL: process.env.PRODUCTION_URL});
+console.log(process.env.NEXT_PUBLIC_API_URL ?? process.env.VERCEL_URL)
+
+const axiosInstance = axios.create({baseURL: process.env.NEXT_PUBLIC_API_URL ?? process.env.VERCEL_URL});
 
 axiosInstance.interceptors.response.use(
 	res => res,
