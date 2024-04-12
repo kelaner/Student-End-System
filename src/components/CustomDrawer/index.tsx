@@ -25,8 +25,12 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import {StudentSeekHelp} from "@/components/CustomDrawer/data";
 import {getGender} from "@/utils/gender";
+import {PostEmergencyAdd} from "@/api/postApi";
+import {EmergencyAddParams} from "@/api/type";
+import axiosInstance from "@/utils/axios";
+import {formatStandardDate} from "@/utils/time";
+import {PutStudentChangePassword, PutTeacherChangePassword} from "@/api/putApi";
 
 
 export default function CustomDrawer({role}: { role?: Role }) {
@@ -67,19 +71,64 @@ export default function CustomDrawer({role}: { role?: Role }) {
 		} else if (password === "" || passwordConfirm === "") {
 			enqueueSnackbar("未填写", {variant: "warning"})
 		} else {
-			enqueueSnackbar("密码修改成功", {variant: "success"})
-			setShowPasswordDialog(false)
+			if (user?.roles === "student") {
+				PutStudentChangePassword(user?.sid ?? "", password).then(res => {
+					if (res.data.code === 200) {
+						enqueueSnackbar("密码修改成功", {variant: "success"})
+						setTimeout(() => {
+							window.location.reload()
+						}, 1500)
+
+					} else {
+						enqueueSnackbar(`密码修改失败：${res.data.msg}`, {variant: "error"})
+					}
+				})
+			} else if (user?.roles === "teacher") {
+				PutTeacherChangePassword(user?.tid ?? "", password).then(res => {
+					if (res.data.code === 200) {
+						enqueueSnackbar("密码修改成功", {variant: "success"})
+						setTimeout(() => {
+							window.location.reload()
+						}, 1500)
+
+					} else {
+						enqueueSnackbar(`密码修改失败：${res.data.msg}`, {variant: "error"})
+					}
+				})
+			}
+
 		}
 	}
 
-	function handleStudentSeekHelp() {
-		StudentSeekHelp(user?.sid as string, user?.sname as string, new Date()).then(res => {
-			if (res.data.code === "200") {
-				console.log("123")
-				alert(123)
 
+	function handleStudentSeekHelp() {
+		const params: EmergencyAddParams = {
+			sid: user?.sid,
+			sname: user?.sname,
+			classid: user?.classid,
+			date: formatStandardDate(new Date()),
+		}
+
+		axiosInstance(`/mental/emergency/list?sid=${user?.sid}`).then(res => {
+			if (res.data.code === 200) {
+				enqueueSnackbar("您已请求过帮助，请耐心等待", {variant: "warning"})
+				return
+			} else {
+				PostEmergencyAdd(params).then(res => {
+					console.log("res", res)
+					if (res.data.code === 200) {
+						enqueueSnackbar("请求成功", {variant: "success"})
+					} else {
+						enqueueSnackbar(`请求失败：${res.data.msg}`, {variant: "error"})
+					}
+
+				}).catch(e => {
+					enqueueSnackbar(`请求失败：${e}`, {variant: "error"})
+				})
 			}
 		})
+
+
 	}
 
 
@@ -88,8 +137,8 @@ export default function CustomDrawer({role}: { role?: Role }) {
 
 			<Card sx={{m: 2, mb: 0, p: 2}}>
 				{/*<Typography variant={"subtitle1"} fontWeight={600}>个人信息</Typography>*/}
-				<Typography variant={"subtitle1"} fontWeight={600}>工号：{user?.sid}</Typography>
-				<Typography variant={"subtitle1"} fontWeight={600}>姓名：{user?.sname}</Typography>
+				<Typography variant={"subtitle1"} fontWeight={600}>工号：{user?.sid ?? user?.tid}</Typography>
+				<Typography variant={"subtitle1"} fontWeight={600}>姓名：{user?.sname ?? user?.tname}</Typography>
 				{
 					user?.roles === "student" &&
             <>
@@ -99,7 +148,7 @@ export default function CustomDrawer({role}: { role?: Role }) {
 				}
 			</Card>
 
-			<Dialog open={showPasswordDialog} onClose={() => setShowPasswordDialog(false)}>
+			<Dialog open={showPasswordDialog} fullWidth maxWidth={"xs"} onClose={() => setShowPasswordDialog(false)}>
 				<DialogTitle>修改密码</DialogTitle>
 				<DialogContent>
 					<Stack direction={"column"} spacing={2} sx={{mt: 1}}>

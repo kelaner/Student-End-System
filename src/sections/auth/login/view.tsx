@@ -4,7 +4,8 @@ import {useEffect, useState} from 'react';
 import {loginAction, Role, userAtom} from "@/utils/user";
 import {Button, Card, Container, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
 import {useAtom} from "jotai";
-import {StudentLogin} from "@/sections/auth/login/data";
+import {StudentLogin, TeacherLogin} from "@/sections/auth/login/data";
+import {enqueueSnackbar} from "notistack";
 
 export default function LoginView() {
 	const [username, setUsername] = useState('');
@@ -24,6 +25,11 @@ export default function LoginView() {
 
 
 	const handleLogin = () => {
+		if (password === "" || username === "") {
+			enqueueSnackbar("用户名或密码不能为空", {variant: "warning"})
+			return
+		}
+
 		if (role === "student") {
 			StudentLogin(username, password).then(res => {
 				console.log("Res", res)
@@ -33,21 +39,32 @@ export default function LoginView() {
 						...res.data.row?.filter((i: { sid: string }) => i.sid === username)[ 0 ],
 						roles: role
 					})
-					window.location.replace("/home")
+					enqueueSnackbar("登录成功", {variant: "success"})
+
+
+				} else {
+					enqueueSnackbar(`账号或密码错误`, {variant: "error"})
 				}
 
-			}).catch()
+			}).catch(e => console.log("e", e))
+		} else if (role === "teacher") {
+			TeacherLogin(username, password).then(res => {
+				console.log("Res", res)
+				if (res.data.code === 200) {
+					console.log(res.data.row?.filter((i: { tid: string }) => i.tid === username)[ 0 ])
+					handleLoginAction[ 1 ]({
+						...res.data.row?.filter((i: { tid: string }) => i.tid === username)[ 0 ],
+						roles: role
+					})
+					enqueueSnackbar("登录成功", {variant: "success"})
+
+				} else {
+					enqueueSnackbar(`账号或密码错误`, {variant: "error"})
+				}
+
+			}).catch(e => console.log("e", e))
 		}
-		// try {
-		// 	// 模拟登录成功
-		// 	const userInfo: Partial<User> = {sid: username, roles: role};
-		// 	handleLoginAction[ 1 ](userInfo)
-		//
-		// 	window.location.replace("/home")
-		// } catch (error) {
-		// 	// 处理登录失败
-		// 	console.error('登录失败:', error);
-		// }
+
 	};
 
 	return (

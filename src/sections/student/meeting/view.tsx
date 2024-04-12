@@ -2,8 +2,6 @@
 
 import React from 'react';
 import {Card, Stack, Typography} from "@mui/material";
-import {Meeting} from "@/type/WarningSYS";
-import dayjs from 'dayjs';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,41 +9,27 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import {GetMeetingTidOrSid} from "@/api/getApi";
+import {useAtom} from "jotai";
+import {userAtom} from "@/utils/user";
+import LoadingScreen from "@/components/LoadingScreen/LoadingScreen";
+import {formatMeetingDate} from "@/utils/time";
 
 interface Props {
-
 }
-
-const metaMeeting: Meeting = {
-	tid: "发起人1", // 发起人
-	Sid: "接收人1",// 接收人
-	Date: new Date(), // 日期
-	Place: "地点1", // 地点
-	Complete: "否", // 是否完成
-}
-
-function createData(
-	tid: string,
-	Sid: string,
-	Date: Date,
-	Place: string,
-	Complete: string
-) {
-	return {tid, Sid, Date, Place, Complete};
-}
-
-const rows: Meeting[] = [
-	createData('发起人1', '接收人1', new Date(), '地点1', '否'),
-	createData('发起人2', '接收人2', new Date(), '地点2', '否'),
-	createData('发起人3', '接收人3', new Date(), '地点3', '是'),
-	createData('发起人4', '接收人4', new Date(), '地点4', '是'),
-	createData('发起人5', '接收人5', new Date(), '地点5', '是'),
-];
 
 function MeetingView(props: Props) {
 
-	function formatMeetingDate(date: Date): string {
-		return dayjs(date).format('M月D日 H点m分');
+	const [user] = useAtom(userAtom)
+
+	const {memoizedValue: {data, isLoading}} = GetMeetingTidOrSid(user?.sid ?? "", "")
+	console.log("data", data)
+
+	const newMessage = data?.row?.filter(i => i.complete === "N")?.[ 0 ]
+
+
+	if (isLoading) {
+		return <LoadingScreen/>
 	}
 
 	return (
@@ -54,9 +38,18 @@ function MeetingView(props: Props) {
 				<Typography variant={"h6"}>
 					最新消息：
 				</Typography>
-				<Typography variant={"h6"}>
-					{`${metaMeeting.Sid}同学，${metaMeeting.tid}老师约您于${formatMeetingDate(metaMeeting.Date)}在${metaMeeting.Place}会谈`}
-				</Typography>
+
+				{
+					newMessage ?
+						<Typography variant={"h6"}>
+							{`${newMessage.sid}同学，${newMessage.tid}老师约您于${formatMeetingDate(newMessage.date)}在${newMessage.place}会谈。`}
+						</Typography>
+						:
+						<Typography variant={"h6"}>
+							暂无最新会谈消息。
+						</Typography>
+				}
+
 			</Card>
 
 			<Card sx={{p: 4, mt: 8}}>
@@ -88,14 +81,14 @@ function MeetingView(props: Props) {
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{rows.map((row, index) => (
+							{data?.row.map((row, index) => (
 								<TableRow
 									key={index}
 									sx={{'&:last-child td, &:last-child th': {border: 0}}}
 								>
 									<TableCell align="center">
 										<Typography variant={"subtitle1"}>
-											{formatMeetingDate(row.Date)}
+											{formatMeetingDate(row.date)}
 										</Typography>
 									</TableCell>
 									<TableCell align="center">
@@ -105,12 +98,12 @@ function MeetingView(props: Props) {
 									</TableCell>
 									<TableCell align="center">
 										<Typography variant={"subtitle1"}>
-											{row.Place}
+											{row.place}
 										</Typography>
 									</TableCell>
 									<TableCell align="center">
-										<Typography variant={"subtitle1"} sx={{color: row.Complete === "否" ? "red" : "green"}}>
-											{row.Complete}
+										<Typography variant={"subtitle1"} sx={{color: row.complete === "N" ? "red" : "green"}}>
+											{row.complete}
 										</Typography>
 									</TableCell>
 

@@ -8,34 +8,45 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import {Records} from "@/type/WarningSYS";
 import dayjs from "dayjs";
+import {useAtom} from "jotai";
+import {userAtom} from "@/utils/user";
+import {GetRecordsList} from "@/api/getApi";
+import LoadingScreen from "@/components/LoadingScreen/LoadingScreen";
 
-const rows: Records[] = [
-	{sid: '记录1', date: new Date(), Score: 80, revise: '否'},
-	{sid: '记录2', date: new Date(), Score: 90, revise: '是', rescore: 95},
-	{sid: '记录3', date: new Date(), Score: 75, revise: '否'},
-	{sid: '记录4', date: new Date(), Score: 85, revise: '是', rescore: 90},
-];
 
 interface Props {
-	sid?: string
+	sid: string
 }
 
 function LogView(props: Props) {
 
+	const [user] = useAtom(userAtom)
+
+	const {memoizedValue: {data, isLoading}} = GetRecordsList(props.sid ?? user?.sid ?? "")
+
+
 	function formatMeetingDate(date: Date): string {
 		return dayjs(date).format('M月D日 H点m分');
+	}
+
+	if (isLoading) {
+		return <LoadingScreen/>
 	}
 
 	return (
 		<Stack direction={"column"} spacing={4}>
 
 			<Card sx={{p: 4}}>
-				<Typography variant={"h6"}>{`最新记录：${rows[ 0 ].sid}`}</Typography>
-				<Typography
-					variant={"h6"}>{`得分：${rows[ 0 ].Score}${rows[ 0 ].revise === '是' ? `(修正后得分：${rows[ 0 ].rescore})` : ''}`}</Typography>
-				<Typography variant={"h6"} textAlign={"end"} mt={4}>{rows[ 0 ].date.toDateString()}</Typography>
+				{data?.row?.length >= 1 ?
+					<>
+						<Typography variant={"h6"}>{`最新记录：${data?.row.slice().reverse()[ 0 ].sid}`}</Typography>
+						<Typography
+							variant={"h6"}>{`得分：${data?.row.slice().reverse()[ 0 ].score}${data?.row.slice().reverse()[ 0 ].revise === 'Y' ? `（修正后得分：${data?.row.slice().reverse()[ 0 ].rescore}）` : ''}`}</Typography>
+						<Typography variant={"h6"} textAlign={"end"} mt={4}>{data?.row.slice().reverse()[ 0 ].date}</Typography>
+					</>
+					: <Typography variant={"h6"}>暂无记录</Typography>
+				}
 			</Card>
 
 			<Card sx={{p: 4}}>
@@ -67,7 +78,7 @@ function LogView(props: Props) {
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{rows.map((record, index) => (
+							{data?.row?.slice().reverse().map((record, index) => (
 								<TableRow
 									key={index}
 									sx={{'&:last-child td, &:last-child th': {border: 0}}}
@@ -79,7 +90,7 @@ function LogView(props: Props) {
 									</TableCell>
 									<TableCell align="center">
 										<Typography variant={"subtitle1"}>
-											{record.Score}
+											{record.score}
 										</Typography>
 									</TableCell>
 									<TableCell align="center">
@@ -100,7 +111,8 @@ function LogView(props: Props) {
 			</Card>
 
 		</Stack>
-	);
+	)
+		;
 }
 
 export default LogView;

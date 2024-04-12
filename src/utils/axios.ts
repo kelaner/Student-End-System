@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosRequestConfig} from "axios";
 import {HOST_API} from "@/sections/global-config";
 
 
@@ -10,3 +10,12 @@ axiosInstance.interceptors.response.use(
 );
 
 export default axiosInstance;
+
+export const fetcher = async (args: string | [string, AxiosRequestConfig]) => {
+	const [url, config] = Array.isArray(args) ? args : [args];
+
+	const res = await axiosInstance.get(url, {...config});
+
+	return res.data;
+};
+
