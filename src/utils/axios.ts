@@ -1,8 +1,6 @@
 import axios, {AxiosRequestConfig} from "axios";
-import {HOST_API} from "@/sections/global-config";
 
-
-const axiosInstance = axios.create({baseURL: HOST_API});
+const axiosInstance = axios.create({baseURL: process.env.NEXT_PUBLIC_API_URL});
 
 axiosInstance.interceptors.response.use(
 	res => res,
