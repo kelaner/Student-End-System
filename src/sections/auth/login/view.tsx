@@ -46,7 +46,10 @@ export default function LoginView() {
 					enqueueSnackbar(`账号或密码错误`, {variant: "error"})
 				}
 
-			}).catch(e => console.log("e", e))
+			}).catch(e => {
+				console.log("e", e)
+				enqueueSnackbar(`登陆错误:${e}`, {variant: "error"})
+			})
 		} else if (role === "teacher") {
 			TeacherLogin(username, password).then(res => {
 				console.log("Res", res)
@@ -62,7 +65,10 @@ export default function LoginView() {
 					enqueueSnackbar(`账号或密码错误`, {variant: "error"})
 				}
 
-			}).catch(e => console.log("e", e))
+			}).catch(e => {
+				console.log("e", e)
+				enqueueSnackbar(`登陆错误:${e}`, {variant: "error"})
+			})
 		}
 
 	};
