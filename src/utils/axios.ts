@@ -1,6 +1,6 @@
 import axios, {AxiosRequestConfig} from "axios";
 
-const axiosInstance = axios.create({baseURL: process.env.NEXT_PUBLIC_API_URL});
+const axiosInstance = axios.create({baseURL: process.env.PRODUCTION_URL});
 
 axiosInstance.interceptors.response.use(
 	res => res,
