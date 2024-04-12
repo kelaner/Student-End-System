@@ -16,7 +16,7 @@ import LoadingScreen from "@/components/LoadingScreen/LoadingScreen";
 
 
 interface Props {
-	sid: string
+	sid?: string
 }
 
 function LogView(props: Props) {

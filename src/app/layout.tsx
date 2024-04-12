@@ -19,6 +19,7 @@ export default function RootLayout({children}: Readonly<{
 	return (
 		<html lang="en">
 		<body>
+
 		<SnackbarProvider>
 			<AntdRegistry>
 				{children}
