@@ -32,10 +32,11 @@ function HomeView() {
 				<Box sx={{width: "100%"}}>
 					<CarouselChart/>
 				</Box>
+
 				<Box sx={{width: "100%", p: 2, my: 2, backgroundColor: "#D9D9D9"}}>
-					<Typography variant="body1">
-						文字栏内容，随意替换即可。
-					</Typography>
+					{/*<Typography variant="body1">*/}
+					{/*	文字栏内容，随意替换即可。*/}
+					{/*</Typography>*/}
 				</Box>
 
 				<TableContainer component={Paper}>
