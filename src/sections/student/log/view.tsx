@@ -1,6 +1,6 @@
 "use client"
-import React from 'react';
-import {Card, Stack, Typography} from "@mui/material";
+import React, {useEffect} from 'react';
+import {Card, CardContent, CardHeader, Stack, Typography} from "@mui/material";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -13,6 +13,7 @@ import {useAtom} from "jotai";
 import {userAtom} from "@/utils/user";
 import {GetRecordsList} from "@/api/getApi";
 import LoadingScreen from "@/components/LoadingScreen/LoadingScreen";
+import MixedChart from "@/components/Chart/ColumnChart";
 
 
 interface Props {
@@ -25,6 +26,30 @@ function LogView(props: Props) {
 
 	const {memoizedValue: {data, isLoading}} = GetRecordsList(props.sid ?? user?.sid ?? "")
 
+	const [chartData, setChartData] = React.useState<{
+		categories: string[],
+		series: number[],
+	}>({
+		categories: [],
+		series: [],
+	})
+
+	useEffect(() => {
+		console.log(data)
+
+
+		if (data?.code === 200) {
+			setChartData({
+				categories: data?.row?.slice().reverse().map((i) => i?.date).slice(0, 12).slice().reverse() || [],
+				series: data?.row?.slice().reverse().map((i) => Number(i?.score)).slice(0, 12).slice().reverse() || [],
+			})
+		}
+
+	}, [data])
+
+	useEffect(() => {
+		console.log(chartData)
+	}, [chartData])
 
 	function formatMeetingDate(date: Date): string {
 		return dayjs(date).format('M月D日 H点m分');
@@ -37,17 +62,47 @@ function LogView(props: Props) {
 	return (
 		<Stack direction={"column"} spacing={4}>
 
-			<Card sx={{p: 4}}>
-				{data?.row?.length >= 1 ?
-					<>
-						<Typography variant={"h6"}>{`最新记录：${data?.row.slice().reverse()[ 0 ].sid}`}</Typography>
-						<Typography
-							variant={"h6"}>{`得分：${data?.row.slice().reverse()[ 0 ].score}${data?.row.slice().reverse()[ 0 ].revise === 'Y' ? `（修正后得分：${data?.row.slice().reverse()[ 0 ].rescore}）` : ''}`}</Typography>
-						<Typography variant={"h6"} textAlign={"end"} mt={4}>{data?.row.slice().reverse()[ 0 ].date}</Typography>
-					</>
-					: <Typography variant={"h6"}>暂无记录</Typography>
-				}
+			<Card
+				sx={{
+					borderRadius: 4,
+					width: "100%",
+					height: "100%",
+				}}
+			>
+				<CardHeader title="测试记录"/>
+				<CardContent
+					sx={{
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						width: "100%",
+						".apexcharts-toolbar": {display: "none"},
+					}}
+				>
+					<MixedChart
+						labels={chartData.categories}
+						series={[
+							{
+								name: "得分",
+								type: "area",
+								data: chartData.series,
+							},
+						]}
+					/>
+				</CardContent>
 			</Card>
+
+			{/*<Card sx={{p: 4}}>*/}
+			{/*	{data?.row?.length >= 1 ?*/}
+			{/*		<>*/}
+			{/*			<Typography variant={"h6"}>{`最新记录：${data?.row.slice().reverse()[ 0 ].sid}`}</Typography>*/}
+			{/*			<Typography*/}
+			{/*				variant={"h6"}>{`得分：${data?.row.slice().reverse()[ 0 ].score}${data?.row.slice().reverse()[ 0 ].revise === 'Y' ? `（修正后得分：${data?.row.slice().reverse()[ 0 ].rescore}）` : ''}`}</Typography>*/}
+			{/*			<Typography variant={"h6"} textAlign={"end"} mt={4}>{data?.row.slice().reverse()[ 0 ].date}</Typography>*/}
+			{/*		</>*/}
+			{/*		: <Typography variant={"h6"}>暂无记录</Typography>*/}
+			{/*	}*/}
+			{/*</Card>*/}
 
 			<Card sx={{p: 4}}>
 				<Typography variant={"h6"}>历史记录</Typography>
