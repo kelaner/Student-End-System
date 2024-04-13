@@ -133,7 +133,7 @@ export default function CustomDrawer({role}: { role?: Role }) {
 
 
 	return (
-		<Box sx={{height: "100%", background: "linear-gradient(102deg, #F1F5FE 8.4%, #FEF8F1 83.36%)",}}>
+		<Box sx={{height: "100vh", background: "linear-gradient(102deg, #F1F5FE 8.4%, #FEF8F1 83.36%)",}}>
 
 			<Card sx={{m: 2, mb: 0, p: 2}}>
 				{/*<Typography variant={"subtitle1"} fontWeight={600}>个人信息</Typography>*/}
