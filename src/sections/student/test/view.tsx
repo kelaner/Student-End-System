@@ -13,6 +13,7 @@ import {RecordsListParams} from "@/api/type";
 import {useAtom} from "jotai";
 import {userAtom} from "@/utils/user";
 import {formatStandardDate} from "@/utils/time";
+import {isMobile} from "react-device-detect";
 
 
 interface SCL90_Type {
@@ -123,17 +124,25 @@ function TestView() {
 						<>
 							{topicIndex === index &&
 
-                  <Card sx={{p: 2, width: "100%", mx: 4}} key={index}>
-                      <Stack direction={"row"} justifyContent={"space-between"} mb={2}>
-                          <Typography variant={"h6"} whiteSpace={"nowrap"}>题目：{SCL90[ topic ]}</Typography>
-                          <Typography variant={"h6"} whiteSpace={"nowrap"}>
+                  <Card sx={{p: 2, width: "100%", mx: isMobile ? 1 : 4}} key={index}>
+                      <Stack direction={"column"} justifyContent={"center"} mb={2} spacing={1}>
+                          <Typography variant={"h6"} whiteSpace={"nowrap"} sx={{textAlign: "center", fontWeight: 600}}>
                               题号:{index + 1}/总题数:{Object.keys(SCL90).length}
                           </Typography>
+												{/*<Typography*/}
+												{/*    variant={"h6"}*/}
+												{/*    sx={{textAlign: "center", fontWeight: 600,color:"#2395F1"}}*/}
+												{/*>题目</Typography>*/}
+                          <Typography
+                              variant={"h6"}
+                              sx={{textAlign: "center", fontWeight: 600}}
+                          >{SCL90[ topic ]}</Typography>
                       </Stack>
+
 
                       <Divider/>
 
-                      <Stack direction={"column"} p={4} mb={8}>
+                      <Stack direction={"column"} p={4} mb={2}>
 												{options.map((i, iIndex) => (
 													<Button
 														variant={scoreList[ index ] === i.value ? "contained" : "outlined"}
