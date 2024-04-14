@@ -14,6 +14,9 @@ import {useAtom} from "jotai";
 import {userAtom} from "@/utils/user";
 import {formatStandardDate} from "@/utils/time";
 import {isMobile} from "react-device-detect";
+import {useSearchParams} from "next/navigation";
+import Draggable from "react-draggable";
+import {Image} from "antd";
 
 
 interface SCL90_Type {
@@ -56,6 +59,9 @@ function TestView() {
 	const [topicIndex, setTopicIndex] = useState<number>(0)
 	const [open, setOpen] = useState<boolean>(false);
 	const [scoreList, setScoreList] = useState<number[]>([])
+	const searchParams = useSearchParams()
+	const aiStatus = searchParams.get("ai");
+	console.log(aiStatus)
 
 	const handleClick = () => {
 
@@ -117,6 +123,40 @@ function TestView() {
 	return (
 		<Box sx={{width: "100%", height: "90vh"}}>
 			<Stack direction={"row"} justifyContent={"center"} alignItems={"center"} sx={{width: "100%", height: "100%"}}>
+
+
+				{aiStatus === "open" && <Draggable>
+            <Card
+                sx={{
+									position: "fixed",
+									right: 20,
+									top: "8vh",
+									zIndex: 9999,
+									background: "white",
+									p: 1,
+									borderRadius: "10px"
+								}}
+            >
+                <Stack direction={"column"} justifyContent={"space-around"} alignItems={"center"}>
+                    <Typography
+                        variant={"subtitle2"}
+                        sx={{textAlign: "center", fontWeight: 600}}
+                    >摄像头拍摄画面</Typography>
+
+                    <Image
+                        alt={"摄像头拍摄画面"}
+                        height={120}
+                        width={120}
+                        preview={false}
+                        style={{pointerEvents: "none", borderRadius: "10px"}}
+											// src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+                        src={"https://th.bing.com/th/id/R.aa3ba4056a9d6ced55e671b8621d94c9?rik=i75n5d153tyz4g&riu=http%3a%2f%2f5b0988e595225.cdn.sohucs.com%2fimages%2f20180227%2f79b0ff0ec9da4aa1b3d2e7910cc0e0f3.gif&ehk=WccpCOIYlOZ7vUzUH%2brLfdbxSe6nOwUly74KbJDvv%2bY%3d&risl=&pid=ImgRaw&r=0"}
+                    />
+                </Stack>
+            </Card>
+
+        </Draggable>}
+
 
 				{Object.keys(SCL90).map((topic: string, index: number) => {
 

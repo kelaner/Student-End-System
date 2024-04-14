@@ -17,7 +17,7 @@ import Collapse from '@mui/material/Collapse';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import Box from "@mui/material/Box";
-import {usePathname} from "next/navigation";
+import {usePathname, useSearchParams} from "next/navigation";
 import {useAtom} from "jotai";
 import {logoutAction, Role, userAtom} from "@/utils/user";
 import {enqueueSnackbar, SnackbarProvider} from "notistack";
@@ -44,6 +44,10 @@ export default function CustomDrawer({role}: { role?: Role }) {
 	const [showPasswordDialog, setShowPasswordDialog] = useState(false)
 	const [password, setPassword] = useState("")
 	const [passwordConfirm, setPasswordConfirm] = useState("")
+	const [showAIDialog, setShowAIDialog] = useState(false)
+	const searchParams = useSearchParams()
+	const aiStatus = searchParams.get("ai");
+
 
 	const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -127,8 +131,14 @@ export default function CustomDrawer({role}: { role?: Role }) {
 				})
 			}
 		})
+	}
 
+	function EnterAITest() {
+		const searchParams = new URLSearchParams({
+			ai: "open",
+		});
 
+		window.open(`/student/test/test?${searchParams}`, "_self");
 	}
 
 
@@ -202,6 +212,26 @@ export default function CustomDrawer({role}: { role?: Role }) {
 				</DialogActions>
 			</Dialog>
 
+			<Dialog open={showAIDialog} fullWidth maxWidth={"xs"} onClose={() => setShowAIDialog(false)}>
+				<DialogTitle textAlign={"center"}>是否进行AI辅助测试</DialogTitle>
+				<DialogContent>
+					<Stack direction={"row"} spacing={2} justifyContent={"center"} alignItems={"center"}>
+						<Button
+							variant={"contained"}
+							color={"inherit"}
+							onClick={() => setShowAIDialog(false)}
+							sx={{m: 2, mt: 0}}>取消</Button>
+						<Button
+							variant={"contained"}
+							color={"primary"}
+							onClick={EnterAITest}
+							sx={{m: 2, mt: 0}}>确认</Button>
+					</Stack>
+
+				</DialogContent>
+
+			</Dialog>
+
 			<List>
 				<ListItemButton onClick={() => window.location.replace("/home")}>
 					<Typography
@@ -246,11 +276,22 @@ export default function CustomDrawer({role}: { role?: Role }) {
                         <ListItemButton
                             onClick={() => window.location.replace("/student/test/test")}
                             sx={{
-															color: path === "/student/test/test" ? "#2395F1" : "#2B2D30",
+															color: ( path === "/student/test/test" && aiStatus == null ) ? "#2395F1" : "#2B2D30",
 															pl: 5
 														}}>
                             <ListItemText primary="测试"/>
                         </ListItemButton>
+
+                        <ListItemButton
+                            onClick={() => setShowAIDialog(true)}
+                            sx={{
+															color: ( path === "/student/test/test" && aiStatus === "open" ) ? "#2395F1" : "#2B2D30",
+															pl: 5,
+															pointerEvents: ( path === "/student/test/test" && aiStatus === "open" ) ? "none" : "auto"
+														}}>
+                            <ListItemText primary="AI辅助测试"/>
+                        </ListItemButton>
+
                         <ListItemButton
                             onClick={() => window.location.replace("/student/test/log")}
                             sx={{
