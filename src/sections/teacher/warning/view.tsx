@@ -1,6 +1,12 @@
 "use client"
 
-import React, {useEffect, useState} from 'react';
+import {DeleteEmergencyDelete} from "@/api/deleteApi";
+import {GetEmergencyClassId} from "@/api/getApi";
+import {PostMeetingAdd} from "@/api/postApi";
+import {MeetingAddParams} from "@/api/type";
+import LoadingScreen from "@/components/LoadingScreen/LoadingScreen";
+import {userAtom} from "@/utils/user";
+import {Icon} from "@iconify/react";
 import {
 	Button,
 	Card,
@@ -8,23 +14,22 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
+	MenuItem,
 	Popover,
 	Stack,
 	TextField,
 	Typography
 } from "@mui/material";
-import {DataGrid, GridActionsCellItem, GridColDef, GridRowSelectionModel} from '@mui/x-data-grid';
-import {enqueueSnackbar} from "notistack";
-import {useAtom} from "jotai";
-import {userAtom} from "@/utils/user";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import {GetEmergencyClassId} from "@/api/getApi";
-import LoadingScreen from "@/components/LoadingScreen/LoadingScreen";
-import {PostMeetingAdd} from "@/api/postApi";
-import {MeetingAddParams} from "@/api/type";
-import {DeleteEmergencyDelete} from "@/api/deleteApi";
-import {Icon} from "@iconify/react";
+import {DataGrid, GridActionsCellItem, GridColDef, GridRowSelectionModel} from '@mui/x-data-grid';
+import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
+import dayjs from "dayjs";
+import {useAtom} from "jotai";
+import {enqueueSnackbar} from "notistack";
+import React, {useEffect, useState} from 'react';
 
 function WarningView() {
 
@@ -221,23 +226,40 @@ function WarningView() {
 				<DialogTitle>{`为学生${selected[ 0 ]}安排会面`}</DialogTitle>
 
 				<DialogContent>
-					<TextField
-						variant={"outlined"}
-						fullWidth
-						label={"会面时间:YYYY-MM-DD"}
-						value={meetTime}
-						onChange={(e) => setMeetTime(e.target.value)}
-						sx={{mt: 2, height: "100%"}}
-					/>
+					<LocalizationProvider dateAdapter={AdapterDayjs}>
+						<DatePicker
+							views={['year', 'month', 'day']}
+							label="会面时间"
+							format={'YYYY-MM-DD'}
+							defaultValue={dayjs(new Date())}
+							onChange={(newValue) => {
+								setMeetTime(dayjs(newValue).format('YYYY-MM-DD'));
+							}}
+							slotProps={{
+								textField: {
+									fullWidth: true,
+									margin: 'normal',
+								},
+							}}
+						/>
+					</LocalizationProvider>
 
 					<TextField
 						variant={"outlined"}
 						fullWidth
 						label={"会面地点"}
+						select
 						value={meetPlace}
 						onChange={(e) => setMeetPlace(e.target.value)}
 						sx={{mt: 2, height: "100%"}}
-					/>
+
+					>
+						{["会议室1", "会议室2", "会议室3", "会议室4"].map((option) => (
+							<MenuItem key={option} value={option}>
+								{option}
+							</MenuItem>
+						))}
+					</TextField>
 
 				</DialogContent>
 
