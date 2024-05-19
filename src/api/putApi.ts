@@ -1,5 +1,5 @@
 import {MeetingUpdateParams} from "@/api/type";
-import axiosInstance from "@/utils/axios";
+import {axiosInstance} from "@/utils/axios";
 
 
 /**

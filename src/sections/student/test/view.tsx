@@ -1,22 +1,22 @@
 "use client"
 
-import React, {useState} from 'react';
-import {Alert, Button, Card, Divider, Stack, Typography} from "@mui/material";
-import Box from "@mui/material/Box";
-import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import SCL_Data from "./SCL-90.json"
-import {enqueueSnackbar} from "notistack";
+import {PostAiVideo} from "@/api/aiApi";
 import {PostRecordsList} from "@/api/postApi";
 import {RecordsListParams} from "@/api/type";
-import {useAtom} from "jotai";
-import {userAtom} from "@/utils/user";
 import {formatStandardDate} from "@/utils/time";
-import {isMobile} from "react-device-detect";
+import {userAtom} from "@/utils/user";
+import CloseIcon from '@mui/icons-material/Close';
+import {Alert, Button, Card, Divider, Stack, Typography} from "@mui/material";
+import Box from "@mui/material/Box";
+import IconButton from '@mui/material/IconButton';
+import Snackbar from '@mui/material/Snackbar';
+import {useAtom} from "jotai";
 import {useSearchParams} from "next/navigation";
+import {enqueueSnackbar} from "notistack";
+import React, {useEffect, useRef, useState} from 'react';
+import {isMobile} from "react-device-detect";
 import Draggable from "react-draggable";
-import {Image} from "antd";
+import SCL_Data from "./SCL-90.json"
 
 
 interface SCL90_Type {
@@ -63,39 +63,51 @@ function TestView() {
 	const aiStatus = searchParams.get("ai");
 	console.log(aiStatus)
 
+	const cameraVideoRef = useRef<HTMLVideoElement>(null);
+
+	const [enablePost, setEnablePost] = useState<boolean>(!( aiStatus === "open" ))
+
+	const [result, setResult] = useState<number>(0)
+
 	const handleClick = () => {
 
-		// 计算总分
-		const total = scoreList.reduce((prev, curr) => prev + curr, 0)
+		if (enablePost) {// 计算总分
+			const total = scoreList.reduce((prev, curr) => prev + curr, 0)
 
-		// 提交
-		console.log(total)
+			// 提交
+			console.log(total)
 
-		const params: RecordsListParams = {
-			sid: user?.sid,
-			date: formatStandardDate(new Date()),
-			score: total,
-			revise: "N",
-		}
-
-		PostRecordsList(params).then(res => {
-			console.log("res", res)
-			if (res.data.code === 200) {
-				enqueueSnackbar("提交成功", {variant: "success", anchorOrigin: {vertical: 'top', horizontal: 'right'}})
-
-				setTimeout(() => {
-					window.location.replace("/student/test/log")
-				}, 1500)
-
-			} else {
-				enqueueSnackbar(`提交失败：${res.data.msg}`, {
-					variant: "error",
-					anchorOrigin: {vertical: 'top', horizontal: 'right'}
-				})
+			const params: RecordsListParams = {
+				sid: user?.sid,
+				date: formatStandardDate(new Date()),
+				score: total + result,
+				revise: "N",
 			}
-		}).catch(e => {
-			console.log("e", e)
-		})
+
+			PostRecordsList(params).then(res => {
+				console.log("res", res)
+				if (res.data.code === 200) {
+					enqueueSnackbar("提交成功", {variant: "success", anchorOrigin: {vertical: 'top', horizontal: 'right'}})
+
+					setTimeout(() => {
+						window.location.replace("/student/test/log")
+					}, 1500)
+
+				} else {
+					enqueueSnackbar(`提交失败：${res.data.msg}`, {
+						variant: "error",
+						anchorOrigin: {vertical: 'top', horizontal: 'right'}
+					})
+				}
+			}).catch(e => {
+				console.log("e", e)
+			})
+		} else {
+			enqueueSnackbar("请先完成面部信息采集", {
+				variant: "warning",
+				anchorOrigin: {vertical: 'top', horizontal: 'right'}
+			})
+		}
 
 	};
 
@@ -120,6 +132,120 @@ function TestView() {
 		</React.Fragment>
 	);
 
+	useEffect(() => {
+		if (aiStatus === "open") {
+			const opt = {
+				audio: false,
+				video: true
+			};
+
+			navigator.mediaDevices.getUserMedia(opt)
+			.then((mediaStream) => {
+				const video = cameraVideoRef.current;
+				// 旧的浏览器可能没有srcObject
+				if (video) {
+					if ('srcObject' in video) {
+						video.srcObject = mediaStream;
+						video.play().then()
+					} else {
+						enqueueSnackbar("您的浏览器不支持摄像头访问", {
+							variant: "error",
+							anchorOrigin: {vertical: 'bottom', horizontal: 'right'}
+						})
+					}
+				}
+			})
+			.catch((err) => {
+				enqueueSnackbar(`未识别到有用设备`, {
+					variant: "warning",
+					anchorOrigin: {vertical: 'bottom', horizontal: 'right'},
+					preventDuplicate: true,
+				})
+
+				console.log("error", err)
+			});
+		}
+	}, [aiStatus])
+
+
+	function startRecording() {
+		const video = cameraVideoRef.current;
+		if (video && video.srcObject) {
+			const chunks: Blob[] = [];
+
+			const recorder = new MediaRecorder(video.srcObject as MediaStream);
+
+			recorder.ondataavailable = function (evt) {
+				chunks.push(evt.data);
+			}
+
+			recorder.onstop = () => {
+				enqueueSnackbar("面部采集结果上传中");
+				const blob = new Blob(chunks, {type: 'video/mp4'});
+
+				//创建一个新的FormData实例
+				const formData = new FormData();
+				//将blob对象添加到formData中
+				formData.append('file', blob, "video.mp4");
+
+				PostAiVideo(formData)
+				.then(res => {
+					if (res.data === 0) {
+						enqueueSnackbar("采集成功", {variant: "success", anchorOrigin: {vertical: 'top', horizontal: 'right'}})
+						setEnablePost(true)
+						setResult(0)
+						console.log("res", res)
+					} else if (res.data === 1) {
+						enqueueSnackbar("采集成功", {variant: "success", anchorOrigin: {vertical: 'top', horizontal: 'right'}})
+						setEnablePost(true)
+						setResult(150)
+						console.log("res", res)
+					} else {
+						enqueueSnackbar("采集失败", {variant: "error", anchorOrigin: {vertical: 'top', horizontal: 'right'}})
+						enqueueSnackbar("请保持面部出现在摄像头画面中", {
+							variant: "error",
+							anchorOrigin: {vertical: 'top', horizontal: 'right'}
+						})
+						setEnablePost(false)
+						console.log("res", res)
+						startRecording()
+					}
+
+				})
+				.catch(e => {
+					enqueueSnackbar(`采集失败`, {
+						variant: "error",
+						anchorOrigin: {vertical: 'top', horizontal: 'right'}
+					})
+					console.log("error", e)
+				})
+
+				// const url = URL.createObjectURL(blob);
+				//
+				// const a = document.createElement('a');
+				// a.setAttribute('style', 'display: none');
+				// a.href = url;
+				// a.download = 'recorded-video.mp4';
+				//
+				// document.body.appendChild(a);
+				// a.click();
+				//
+				// window.URL.revokeObjectURL(url);
+			}
+
+			enqueueSnackbar("面部采集开始")
+			recorder.start();
+			setTimeout(function () {
+				enqueueSnackbar("面部采集结束");
+				recorder.stop();
+			}, 10000);
+		} else {
+			enqueueSnackbar("camera is null or undefined");
+		}
+
+	}
+
+
 	return (
 		<Box sx={{width: "100%", height: "90vh"}}>
 			<Stack direction={"row"} justifyContent={"center"} alignItems={"center"} sx={{width: "100%", height: "100%"}}>
@@ -143,14 +269,16 @@ function TestView() {
                         sx={{textAlign: "center", fontWeight: 600}}
                     >摄像头拍摄画面</Typography>
 
-                    <Image
-                        alt={"摄像头拍摄画面"}
-											// height={120}
-                        width={120}
-                        preview={false}
-                        style={{pointerEvents: "none", borderRadius: "10px"}}
-											// src="/png/face.png"
-                        src={"https://th.bing.com/th/id/R.aa3ba4056a9d6ced55e671b8621d94c9?rik=i75n5d153tyz4g&riu=http%3a%2f%2f5b0988e595225.cdn.sohucs.com%2fimages%2f20180227%2f79b0ff0ec9da4aa1b3d2e7910cc0e0f3.gif&ehk=WccpCOIYlOZ7vUzUH%2brLfdbxSe6nOwUly74KbJDvv%2bY%3d&risl=&pid=ImgRaw&r=0"}
+                    <video
+                        autoPlay
+                        loop
+                        muted
+											// controls
+                        width="120"
+                        height="120"
+                        id={"cameraVideo"}
+                        onLoadedData={startRecording}
+                        ref={cameraVideoRef}
                     />
                 </Stack>
             </Card>

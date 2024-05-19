@@ -1,4 +1,4 @@
-import axiosInstance from "@/utils/axios";
+import {axiosInstance} from "@/utils/axios";
 import {EmergencyAddParams, MeetingAddParams, RecordsListParams} from "@/api/type";
 
 

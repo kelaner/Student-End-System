@@ -226,12 +226,13 @@ function WarningView() {
 				<DialogTitle>{`为学生${selected[ 0 ]}安排会面`}</DialogTitle>
 
 				<DialogContent>
-					<LocalizationProvider dateAdapter={AdapterDayjs}>
+					<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"zh-cn"}>
 						<DatePicker
 							views={['year', 'month', 'day']}
 							label="会面时间"
 							format={'YYYY-MM-DD'}
 							defaultValue={dayjs(new Date())}
+							minDate={dayjs(new Date())}
 							onChange={(newValue) => {
 								setMeetTime(dayjs(newValue).format('YYYY-MM-DD'));
 							}}
