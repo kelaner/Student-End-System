@@ -202,8 +202,8 @@ function TestView() {
 						console.log("res", res)
 					} else {
 						enqueueSnackbar("采集失败", {variant: "error", anchorOrigin: {vertical: 'top', horizontal: 'right'}})
-						enqueueSnackbar("请保持面部出现在摄像头画面中", {
-							variant: "error",
+						enqueueSnackbar(res?.data, {
+							variant: "warning",
 							anchorOrigin: {vertical: 'top', horizontal: 'right'}
 						})
 						setEnablePost(false)
