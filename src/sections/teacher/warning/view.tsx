@@ -40,7 +40,7 @@ function WarningView() {
 	const open = Boolean(anchorEl);
 	const {memoizedValue: {data, isLoading}, mutate} = GetEmergencyClassId(selectClass)
 	const [showDialog, setShowDialog] = useState(false)
-	const [meetTime, setMeetTime] = useState("")
+	const [meetTime, setMeetTime] = useState(dayjs(new Date()).format('YYYY-MM-DD'))
 	const [meetPlace, setMeetPlace] = useState("")
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 	const [deleteSid, setDeleteSid] = useState("")

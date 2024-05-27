@@ -1,8 +1,9 @@
 "use client"
 
 import {PostAiVideo} from "@/api/aiApi";
-import {PostRecordsList} from "@/api/postApi";
-import {RecordsListParams} from "@/api/type";
+import {PostEmergencyAdd, PostRecordsList} from "@/api/postApi";
+import {EmergencyAddParams, RecordsListParams} from "@/api/type";
+import {axiosInstance} from "@/utils/axios";
 import {formatStandardDate} from "@/utils/time";
 import {userAtom} from "@/utils/user";
 import CloseIcon from '@mui/icons-material/Close';
@@ -80,8 +81,9 @@ function TestView() {
 			const params: RecordsListParams = {
 				sid: user?.sid,
 				date: formatStandardDate(new Date()),
-				score: total + result,
-				revise: "N",
+				score: total,
+				revise: aiStatus === null ? "N" : "Y",
+				rescore: aiStatus === null ? undefined : total + result,
 			}
 
 			PostRecordsList(params).then(res => {
@@ -89,9 +91,36 @@ function TestView() {
 				if (res.data.code === 200) {
 					enqueueSnackbar("提交成功", {variant: "success", anchorOrigin: {vertical: 'top', horizontal: 'right'}})
 
-					setTimeout(() => {
-						window.location.replace("/student/test/log")
-					}, 1500)
+					if (( total + result ) >= 150) {
+						axiosInstance(`/mental/emergency/list?sid=${user?.sid}`).then(res => {
+							if (res.data.code === 200) {
+								// enqueueSnackbar("您已请求过帮助，请耐心等待", {variant: "warning"})
+								return
+							} else {
+								const params: EmergencyAddParams = {
+									sid: user?.sid,
+									sname: user?.sname,
+									classid: user?.classid,
+									date: formatStandardDate(new Date()),
+								}
+								PostEmergencyAdd(params).then(res => {
+									console.log("res", res)
+									if (res.data.code === 200) {
+										enqueueSnackbar("测试分数超过预警阈值，已为您创建预警记录", {variant: "success"})
+									} else {
+										enqueueSnackbar(`请求失败：${res.data.msg}`, {variant: "error"})
+									}
+
+								}).catch(e => {
+									enqueueSnackbar(`请求失败：${e}`, {variant: "error"})
+								})
+							}
+						})
+					}
+
+					// setTimeout(() => {
+					// 	window.location.replace("/student/test/log")
+					// }, 2000)
 
 				} else {
 					enqueueSnackbar(`提交失败：${res.data.msg}`, {
